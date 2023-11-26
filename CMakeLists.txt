@@ -23,6 +23,7 @@ add_executable(myprogram ${SOURCES})
 # Adjust the paths accordingly based on your actual file structure
 target_link_libraries(myprogram
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/libglfw3dll.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libfreeglut.a
     opengl32
 )
 
@@ -30,6 +31,7 @@ target_link_libraries(myprogram
 add_custom_command(TARGET myprogram POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CMAKE_CURRENT_SOURCE_DIR}/glfw3.dll
+    ${CMAKE_CURRENT_SOURCE_DIR}/freeglut.dll
     $<TARGET_FILE_DIR:myprogram>
 )
 
