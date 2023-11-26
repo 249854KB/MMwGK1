@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(Lab1)
-
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,7 +23,9 @@ add_executable(myprogram ${SOURCES})
 target_link_libraries(myprogram
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/libglfw3dll.a
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/libfreeglut.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libfreeglut_static.a
     opengl32
+    glu32
 )
 
 # Copy glfw3.dll to the output directory
