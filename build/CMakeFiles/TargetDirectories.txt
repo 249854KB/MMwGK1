@@ -1,0 +1,3 @@
+C:/Polibuda/Grafika komputerowa/Laboratoria/Lab1/build/CMakeFiles/myprogram.dir
+C:/Polibuda/Grafika komputerowa/Laboratoria/Lab1/build/CMakeFiles/edit_cache.dir
+C:/Polibuda/Grafika komputerowa/Laboratoria/Lab1/build/CMakeFiles/rebuild_cache.dir
