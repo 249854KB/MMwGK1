@@ -95,3 +95,5 @@ int main(int argc, char **argv) {
     glutMainLoop();
     return 0;
 }
+
+// Wniosek: W OpenGL można w łatwy sposób robić odbicia lustrzane lub szyki liniowe co bardzo odciąża procesor przy obliczeniach. Do ruchu można wykorzystać wszystkie osie.
