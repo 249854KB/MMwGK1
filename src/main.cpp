@@ -28,13 +28,14 @@ std::vector<std::vector<Triangle>> triangles = {
     {
         Triangle{1, 3, {0.5, 0.2, 0.8, 1.0}}, // purple
         Triangle{-1, -1, {0.8, 0.7, 0.2, 1.0}}// yellow
+        // Triangle{3, 1, {0.8, 0.2, 0.5, 1.0}}  // pinkish
         
     },
     {
         Triangle{1, 1, {0.2, 0.5, 0.8, 1.0}}, // light blue
         Triangle{3, 1, {0.8, 0.1, 0.1, 1.0}},  // dark red
         // Triangle{2, 2, {0.9, 0.8, 0.2, 1.0}},  // light yellow
-        // Triangle{3, 1, {0.8, 0.2, 0.5, 1.0}}  // pinkish
+        
     }
 };
 
@@ -79,6 +80,7 @@ void show() {
     glFlush();
 }
 
+// Standardowa procedura
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
@@ -97,3 +99,4 @@ int main(int argc, char **argv) {
 }
 
 // Wniosek: W OpenGL można w łatwy sposób robić odbicia lustrzane lub szyki liniowe co bardzo odciąża procesor przy obliczeniach. Do ruchu można wykorzystać wszystkie osie.
+// Prosze odpalic myprogram.exe lub zobaczyc screeny efekt koncowy
