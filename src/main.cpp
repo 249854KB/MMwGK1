@@ -1,102 +1,119 @@
-
 #include <unistd.h>
 #include <vector>
 #include <GL/freeglut.h>
+#include <SOIL/SOIL.h> // Include SOIL for texture loading
 
-struct Point {
+struct Mass {
     float x;
     float y;
+    float radius;
+    GLuint textureID; // Texture for the mass
 };
 
-struct Triangle {
+struct Spring {
     float x;
     float y;
-    float color[4]; // Color
+    float length;
+    GLuint textureID; // Texture for the spring
 };
 
-int degree = 0;
-const float speed = 1.5;
-float rate = 1000000 / 60;
-
-Point points[3] = {
-    Point{-1.0, -1.0},
-    Point{1.0, -1.0},
-    Point{-1.0, 1.0}
+struct Ceiling {
+    GLuint textureID; // Texture for the ceiling
 };
 
-std::vector<std::vector<Triangle>> triangles = {
-    {
-        Triangle{1, 3, {0.5, 0.2, 0.8, 1.0}}, // purple
-        Triangle{-1, -1, {0.8, 0.7, 0.2, 1.0}}// yellow
-        // Triangle{3, 1, {0.8, 0.2, 0.5, 1.0}}  // pinkish
-        
-    },
-    {
-        Triangle{1, 1, {0.2, 0.5, 0.8, 1.0}}, // light blue
-        Triangle{3, 1, {0.8, 0.1, 0.1, 1.0}},  // dark red
-        // Triangle{2, 2, {0.9, 0.8, 0.2, 1.0}},  // light yellow
-        
-    }
-};
+float massPosition = 0.0;
+const float springLength = 3.0;
+const float springConstant = 0.1;
+const float dampingFactor = 0.05;
+const float gravity = 0.005;
+
+Mass mass = {0.0, 0.0, 1.0}; // Initial position and radius of the mass
+Spring spring = {0.0, 0.0, springLength}; // Initial position and length of the spring
+Ceiling ceiling;
+
+void loadTextures() {
+    // Load textures for the mass, spring, and ceiling
+    mass.textureID = SOIL_load_OGL_texture("mass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+    spring.textureID = SOIL_load_OGL_texture("spring.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+    ceiling.textureID = SOIL_load_OGL_texture("ceiling.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+}
+
+void updatePhysics() {
+    float displacement = massPosition - springLength;
+    float springForce = -springConstant * displacement;
+    float dampingForce = -dampingFactor * massPosition;
+
+    float totalForce = springForce + dampingForce - gravity;
+    float acceleration = totalForce / mass.radius;
+
+    massPosition += acceleration;
+}
+
+void drawMass() {
+    glBindTexture(GL_TEXTURE_2D, mass.textureID);
+    glBegin(GL_QUADS);
+    glTexCoord2d(0, 0); glVertex2f(mass.x - mass.radius, mass.y - massPosition - mass.radius);
+    glTexCoord2d(1, 0); glVertex2f(mass.x + mass.radius, mass.y - massPosition - mass.radius);
+    glTexCoord2d(1, 1); glVertex2f(mass.x + mass.radius, mass.y - massPosition + mass.radius);
+    glTexCoord2d(0, 1); glVertex2f(mass.x - mass.radius, mass.y - massPosition + mass.radius);
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void drawSpring() {
+    glBindTexture(GL_TEXTURE_2D, spring.textureID);
+    glBegin(GL_QUADS);
+    glTexCoord2d(0, 0); glVertex2f(spring.x - 0.1, spring.y);
+    glTexCoord2d(1, 0); glVertex2f(spring.x + 0.1, spring.y);
+    glTexCoord2d(1, 1); glVertex2f(spring.x + 0.1, spring.y - springLength);
+    glTexCoord2d(0, 1); glVertex2f(spring.x - 0.1, spring.y - springLength);
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void drawCeiling() {
+    glBindTexture(GL_TEXTURE_2D, ceiling.textureID);
+    glBegin(GL_QUADS);
+    glTexCoord2d(0, 0); glVertex2f(-10, 10);
+    glTexCoord2d(1, 0); glVertex2f(10, 10);
+    glTexCoord2d(1, 1); glVertex2f(10, 9.9);
+    glTexCoord2d(0, 1); glVertex2f(-10, 9.9);
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 void show() {
-    double rotation = (int)(degree * speed) % 360;
-    degree += 1;
-    double distance = abs(rotation / 360.0 * 2 - 1);
-
     glLoadIdentity();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (int r = 0; r < 2; r++) {
-        rotation = -rotation;
+    updatePhysics();
 
-        for (int i = 0; i < 4; i++) {//4 razy rysujemy to samo tylko obrócone
-            glPushMatrix();
-            glRotated(90 * i, 0, 0, 1); 
-            glRotated(-rotation, 0, 0, 1);
-            glTranslated(0.5 * distance, 0.5 * distance, 0);
+    drawCeiling();
+    drawSpring();
+    drawMass();
 
-            for (Triangle triangle : triangles[r]) {
-                glPushMatrix();
-                glTranslated(triangle.x, triangle.y, 0);
-                glTranslated(triangle.x * distance, triangle.y * distance, 0);
-                glRotated(rotation * 2, 0, 0, 1);
-                glColor4fv(triangle.color);
-
-                glBegin(GL_POLYGON);
-                glVertex2f(points[0].x, points[0].y);
-                glVertex2f(points[1].x, points[1].y);
-                glVertex2f(points[2].x, points[2].y);
-                glEnd();
-
-                glPopMatrix();
-            }
-            glPopMatrix();
-        }
-    }
-
-    usleep(rate);
+    usleep(10000);
     glutPostRedisplay();
     glFlush();
 }
 
-// Standardowa procedura
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(0, 0);
-    glutCreateWindow("Lab 3");
+    glutCreateWindow("Mass on Spring Animation");
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glViewport(0, 0, 800, 800);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(-10, 10, -10, 10);
     glMatrixMode(GL_MODELVIEW);
+
+    glEnable(GL_TEXTURE_2D);
+    loadTextures();
+
     glutDisplayFunc(show);
     glutMainLoop();
     return 0;
 }
-
-// Wniosek: W OpenGL można w łatwy sposób robić odbicia lustrzane lub szyki liniowe co bardzo odciąża procesor przy obliczeniach. Do ruchu można wykorzystać wszystkie osie.
-// Prosze odpalic myprogram.exe lub zobaczyc screeny efekt koncowy
