@@ -330,3 +330,9 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+//Wnioski:
+// Tekstury 2d słabo radzą sobie z powierzchniami krzywymi. Wyglądają po prostu źle. 
+// Żeby załadować tekstury należy skorzystać z dodatkowych bibliotek
+// Wydajność programu srastycznie spada po załadowaniu tekstur 
+// Efekt końcowy widoczny na zdjęciach 1 i 2 i w programie w folderze build, lecz niestety ten program ma problem z załadowaniem zdjęć na innych ścieżkach niż ta podana w programie, więc program odpali się bez tekstur 
